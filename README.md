@@ -9,7 +9,6 @@ A basic Puzzle & Dragons automation bot using Appium, OpenCV, and scrcpy.
 - Calculates the best swipe path for max combos.
 - Drags the orbs on the screen automatically.
 - Waits for attack animations to complete by monitoring orb brightness.
-- Runs infinitely until a "CLEAR" screen is detected.
 
 ## Setup
 
@@ -42,7 +41,7 @@ A basic Puzzle & Dragons automation bot using Appium, OpenCV, and scrcpy.
      ```bash
      bash start.sh --scrcpy
      ```
-   - Limit number of rounds (if custom version supports it):
+   - Limit number of rounds:
      ```bash
      bash start.sh --round 5
      ```
@@ -68,7 +67,4 @@ pad-bot-appium/
 
 ## Notes
 
-- Default behavior is infinite rounds until a "CLEAR" screen is detected.
 - Make sure orb screenshots (`red_orb.png`, `blue_orb.png`, etc.) are placed inside the `screenshots/` folder.
-- The bot expects a reference image `clear_screen.png` to detect dungeon clear automatically.
-
