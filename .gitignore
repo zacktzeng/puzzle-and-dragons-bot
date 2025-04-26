@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+.env/
+
+# macOS
+.DS_Store
+
+# Screenshots cache or generated files (optional if you want to regenerate them)
+screenshots/*.png
+
+# Logs
+*.log
+
+# Appium sessions (optional)
+appium.log
+
+# System
+.idea/
+.vscode/
+*.swp
