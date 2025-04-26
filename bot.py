@@ -251,22 +251,37 @@ def wait_for_attack_and_recovery(driver, top_left, bottom_right, sample_orbs=[(2
     time.sleep(1.0)
 
     print("⏳ Checking orb brightness for recovery...")
-    max_attempts = 5
-    for attempt in range(max_attempts):
-        brightnesses = [int(get_orb_brightness(driver, r, c, top_left, bottom_right)) for r, c in sample_orbs]
-        print(f"📈 Brightnesses attempt {attempt+1}: {brightnesses}")
+    max_attempts = 10
 
-        if any(b >= RECOVERY_THRESHOLD for b in brightnesses):
-            print("✅ Board ready for next move!")
-            return
+    for attempt in range(max_attempts):
+        try:
+            brightnesses = []
+            for r, c in sample_orbs:
+                brightness = get_orb_brightness(driver, r, c, top_left, bottom_right)
+                brightnesses.append(brightness)
+
+                # 🔥 Immediately check after each orb
+                if brightness >= RECOVERY_THRESHOLD:
+                    print(f"✅ Brightness {brightness} exceeded threshold {RECOVERY_THRESHOLD}. Board ready!")
+                    return
+
+            print(f"📈 Brightnesses attempt {attempt + 1}: {brightnesses}")
+
+        except Exception as e:
+            print(f"⚠️ Error capturing brightness: {e}")
 
         time.sleep(1.0)
 
     print("⚠️ Proceeding after maximum brightness checks.")
 
 
-# --- Main ---
-def main(rounds_to_play):
+def main():
+    try:
+        rounds_to_play = int(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_ROUNDS_TO_PLAY
+    except Exception:
+        print(f"⚠️ Invalid rounds argument, defaulting to {DEFAULT_ROUNDS_TO_PLAY}.")
+        rounds_to_play = DEFAULT_ROUNDS_TO_PLAY
+
     options = UiAutomator2Options()
     options.platform_name = "Android"
     options.device_name = "Android Device"
@@ -288,10 +303,12 @@ def main(rounds_to_play):
             print("❌ Failed to build orb grid")
             break
 
-        all_centers = [(m["x"] + m["w"]//2, m["y"] + m["h"]//2) for m in matches]
+        # 🔥 Move this part up BEFORE calling swipe or recovery!
+        all_centers = [(m["x"] + m["w"] // 2, m["y"] + m["h"] // 2) for m in matches]
         top_left = (min(x for x, y in all_centers), min(y for x, y in all_centers))
         bottom_right = (max(x for x, y in all_centers), max(y for x, y in all_centers))
 
+        # 🔥 Find best path and execute
         path, combos = find_best_path(orb_grid)
         print(f"💡 Best Path: {path}")
         print(f"🔥 Combos: {combos}")
@@ -305,12 +322,5 @@ def main(rounds_to_play):
 
     driver.quit()
 
-# Entry point
 if __name__ == "__main__":
-    try:
-        rounds_arg = int(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_ROUNDS_TO_PLAY
-    except ValueError:
-        print(f"⚠️ Invalid argument. Using default {DEFAULT_ROUNDS_TO_PLAY} rounds.")
-        rounds_arg = DEFAULT_ROUNDS_TO_PLAY
-
-    main(rounds_arg)
+    main()
